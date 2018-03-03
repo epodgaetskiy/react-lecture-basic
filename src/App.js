@@ -1,7 +1,18 @@
-import React, { Component } from "react";
+import React from "react";
 import { events } from "./events";
 
-class Event extends Component {
+function Title(props) {
+  return <h1>{props.title}</h1>;
+}
+
+function Description(props) {
+  return <p>{props.description}</p>;
+}
+
+function Image(props) {
+  return <img width="125px" src={props.image} />;
+}
+class Event extends React.Component {
   constructor(props) {
     super(props);
 
@@ -9,87 +20,68 @@ class Event extends Component {
       like: false
     };
   }
-
-  handleClick = () => {
-    if (this.state.like) {
-      this.props.minusLike();
-    } else {
-      this.props.plusLike();
-    }
-    this.setState({
-      like: !this.state.like
-    });
-  };
   render() {
+    console.log(this.props);
     return (
-      <div style={{ width: "150px", marginRight: "30px" }}>
-        <img width="150px" src={this.props.event.image} />
-        <h2>{this.props.event.title}</h2>
-        <p>{this.props.event.description}</p>
+      <div>
+        <Image image={this.props.image} />
+        <Title title={this.props.title} />
+        <Description description={this.props.description} />
         {this.state.like ? (
-          <img onClick={this.handleClick} width="20" src="like.png" />
+          <img
+            onClick={() => {
+              this.setState({
+                like: false
+              });
+              this.props.minus();
+            }}
+            width="30px"
+            src="like.png"
+          />
         ) : (
-          <img onClick={this.handleClick} width="20" src="unlike.png" />
+          <img
+            width="30px"
+            src="unlike.png"
+            onClick={() => {
+              this.setState({
+                like: true
+              });
+              this.props.plus();
+            }}
+          />
         )}
       </div>
     );
   }
 }
 
-function LikeCount(props) {
-  return <p>Количество лайков: {props.count}</p>;
-}
-
-function Events(props) {
-  return (
-    <div>
-      <p>Список событий</p>
-      <div style={{ display: "flex" }}>
-        {props.events.map((event, index) => {
-          return (
-            <Event
-              key={event.id}
-              event={event}
-              plusLike={props.plusLike}
-              minusLike={props.minusLike}
-            />
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-class App extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      likeCount: 0
-    };
-  }
+class App extends React.Component {
+  state = {
+    count: 0
+  };
 
   plusLike = () => {
     this.setState({
-      likeCount: this.state.likeCount + 1
+      count: this.state.count + 1
     });
   };
 
   minusLike = () => {
     this.setState({
-      likeCount: this.state.likeCount - 1
+      count: this.state.count - 1
     });
   };
-
   render() {
     return (
       <div>
-        <Events
-          events={events}
-          plusLike={this.plusLike}
-          minusLike={this.minusLike}
+        <p>Колличество лайков: {this.state.count}</p>
+        <Event
+          title="Лекция по ReactJS"
+          description="Базовая теория"
+          image="1.jpg"
+          plus={this.plusLike}
+          minus={this.minusLike}
         />
-        <LikeCount count={this.state.likeCount} />
       </div>
     );
   }
